@@ -1,0 +1,70 @@
+# .gitignore for a small Python console project
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Type checkers / caches
+.mypy_cache/
+.pyre/
+.pytype/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python distributions
+*.egg
+*.whl
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Optional: ignore generated Excel output files (uncomment if desired)
+# RESULTADO_*.xlsx
+# *.xlsx
+
+# Lockfiles / local editor state
+.python-version
+
+# Logs
+*.log
+
+# Sensitive files - add any project-specific secrets here
+# secrets.yaml
