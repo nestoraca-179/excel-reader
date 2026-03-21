@@ -5,7 +5,7 @@ Analista de Datos & Data Scientist
 
 import time
 
-from controller.DataController import validar_coincidencias_avanzado, validar_coincidencias_inverso, validar_coincidencias_inverso
+from controller.DataController import validate_match_advanced, validate_match_inverse
 from controller.ExcelController import *
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
@@ -37,22 +37,18 @@ def main():
         print(f"📊 Total registros: {len(lista_adm) + len(lista_con):,}")
         print("\n🎉 DTOs listos para usar en análisis/data science!")
 
-        # Las listas están listas para usar:
-        # print(lista_adm[0])  # Primer registro ADM
-        # print(lista_con[0])  # Primer registro CON
-
         # 4. Buscando coincidencias
-        # print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE ADM Y CON...")
-        # time.sleep(2)  # Simulación de proceso
+        print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE ADM Y CON...")
+        time.sleep(2)  # Simulación de proceso
 
-        # validar_coincidencias_avanzado(lista_adm, lista_con)
+        validate_match_advanced(lista_adm, lista_con)
         # escribir_hoja_adm(EXCEL_FILE_RESULT_ADM_PATH, lista_adm)  # Guardar resultados en nueva hoja
-        # time.sleep(2)
+        time.sleep(2)
 
-        # print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE CON Y ADM...")
-        # time.sleep(2)  # Simulación de proceso
+        print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE CON Y ADM...")
+        time.sleep(2)  # Simulación de proceso
 
-        validar_coincidencias_inverso(lista_con, lista_adm)
+        validate_match_inverse(lista_con, lista_adm)
         # escribir_hoja_con(EXCEL_FILE_RESULT_CON_PATH, lista_con)  # Guardar resultados en nueva hoja
         time.sleep(2)
 

@@ -4,7 +4,7 @@ from typing import List
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
 
-def validar_coincidencias_avanzado(lista_adm: List[AdmDto], lista_con: List[ConDto]):
+def validate_match_advanced(lista_adm: List[AdmDto], lista_con: List[ConDto]):
     """Valida: 1) nro_doc (ADM) == docref (CON) Y 2) co_cli (ADM) ⊆ descri (CON)"""
     print("\n" + "=" * 90)
     print("🔍 VALIDACIÓN AVANZADA: nro_doc (ADM) == docref (CON) + co_cli ⊆ descri")
@@ -18,7 +18,7 @@ def validar_coincidencias_avanzado(lista_adm: List[AdmDto], lista_con: List[ConD
     # docref_index = {dto.docref: i+2 for i, dto in enumerate(lista_con)}  # fila Excel
     docref_index = {}
     for i, dto in enumerate(lista_con):
-        docref = dto.docref.strip() + "/" + str(abs(float(dto.MontoD or dto.MontoH)))
+        docref = str(int(float(dto.docref or 0))) + "/" + str(abs(float(dto.MontoD or dto.MontoH)))
         if docref not in docref_index:  # Solo si NO existe aún
             docref_index[docref] = i + 2
 
@@ -29,7 +29,7 @@ def validar_coincidencias_avanzado(lista_adm: List[AdmDto], lista_con: List[ConD
         total_neto = abs(adm.total_neto)
         saldo_new = adm.saldo_new
 
-        # print(f"🔎 Evaluando ADM #{idx_adm:4d} | co_tipo_doc='{co_tipo_doc}' | nro_doc='{nro_doc}' | co_cli='{co_cli}'", end=" → ")
+        print(f"🔎 Evaluando ADM #{idx_adm:4d} | co_tipo_doc='{co_tipo_doc}' | nro_doc='{nro_doc}' | co_cli='{co_cli}'", end=" → ")
 
         if co_tipo_doc == "ISLR":
             # print(f"⏭️  Ignorado por tipo_doc 'ISLR' - {saldo_new}")
@@ -45,21 +45,21 @@ def validar_coincidencias_avanzado(lista_adm: List[AdmDto], lista_con: List[ConD
             # print(f"📄 CON fila {fila_con} | descri='{con_registro.descri[:50]}...' | monto={monto_con}", end=" → ")
             # print("\n total_neto ADM:", total_neto, "| monto_con CON:", monto_con, end=" → ")
             if (total_neto != monto_con):
-                # print(f"❌ Monto NO coincide (ADM.total_neto={total_neto} vs CON.monto={monto_con})")
+                print(f"❌ Monto NO coincide (ADM.total_neto={total_neto} vs CON.monto={monto_con})")
                 total_no_matches += 1
                 continue
 
             # 🎯 VERIFICAR co_cli DENTRO de descri
             if (co_cli in descri_con): # and (total_neto == monto_con):
-                # print("✅✅ COINCIDENCIA COMPLETA!")
+                print("✅✅ COINCIDENCIA COMPLETA!")
                 total_matches += 1
                 total_acc_saldo_new += saldo_new
                 adm.coincidence = fila_con
             else:
-                # print(f"❌ co_cli '{co_cli}' NO en descri")
+                print(f"❌ co_cli '{co_cli}' NO en descri")
                 total_no_matches += 1
         else:
-            # print("❌ SIN coincidencia nro_doc")
+            print("❌ SIN coincidencia nro_doc")
             total_no_matches += 1
 
     # 📊 RESUMEN DETALLADO
@@ -82,7 +82,7 @@ def validar_coincidencias_avanzado(lista_adm: List[AdmDto], lista_con: List[ConD
             for adm in adm_list:
                 print(f"   - ADM.co_tipo_doc='{adm.co_tipo_doc}' | ADM.nro_doc='{adm.nro_doc}' | ADM.co_cli='{adm.co_cli}' | ADM.saldo_new={adm.saldo_new}")
 
-def validar_coincidencias_inverso(lista_con: List[ConDto], lista_adm: List[AdmDto]):
+def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
     """INVERSO: 1) docref (CON) == nro_doc (ADM) Y 2) co_cli (ADM) ⊆ descri (CON)"""
     print("\n" + "=" * 90)
     print("🔄 VALIDACIÓN INVERSA: docref (CON) → nro_doc (ADM) + co_cli ⊆ descri")
