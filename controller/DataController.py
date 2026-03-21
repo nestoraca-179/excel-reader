@@ -22,10 +22,10 @@ def validate_match_advanced(lista_adm: List[AdmDto], lista_con: List[ConDto]):
         if docref not in docref_index:  # Solo si NO existe aún
             docref_index[docref] = i + 2
 
-    for idx_adm, adm in enumerate(lista_adm, 1):  # idx_adm = fila Excel ADM
+    for idx_adm, adm in enumerate(lista_adm, 1):
         co_tipo_doc = adm.co_tipo_doc.strip()
         nro_doc = adm.nro_doc.strip()
-        co_cli = adm.co_cli.strip().upper()  # Normalizar para comparación
+        co_cli = adm.co_cli.strip().upper()
         total_neto = abs(adm.total_neto)
         saldo_new = adm.saldo_new
 
@@ -42,8 +42,6 @@ def validate_match_advanced(lista_adm: List[AdmDto], lista_con: List[ConDto]):
             descri_con = str(con_registro.descri).upper()
             monto_con = float(con_registro.MontoD or con_registro.MontoH)
 
-            # print(f"📄 CON fila {fila_con} | descri='{con_registro.descri[:50]}...' | monto={monto_con}", end=" → ")
-            # print("\n total_neto ADM:", total_neto, "| monto_con CON:", monto_con, end=" → ")
             if (total_neto != monto_con):
                 print(f"❌ Monto NO coincide (ADM.total_neto={total_neto} vs CON.monto={monto_con})")
                 total_no_matches += 1
@@ -103,9 +101,6 @@ def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
         docref = con.docref.strip()
         monto_con = float(con.MontoD or con.MontoH)
         descri_con = str(con.descri).upper()
-        # print(f"Fila CON: {idx_con} | Docref: {docref} | Monto CON: {monto_con} | Descri: '{con.descri[:30]}...'")
-        # print(f"🔎 INVERSO CON #{idx_con:4d} | docref='{docref}' | monto={monto_con}", end=" → ")
-        # time.sleep(3)
 
         if (docref + "/" + str(monto_con)) in nro_doc_index:
             fila_adm = nro_doc_index[docref + "/" + str(monto_con)]
@@ -115,11 +110,6 @@ def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
             co_cli_adm = adm_registro.co_cli.strip().upper()
             # co_tipo_doc_adm = adm_registro.co_tipo_doc.strip()
 
-            # print(f"Fila ADM: {fila_adm} | co_tipo_doc='{co_tipo_doc_adm}' | Nro. Doc {adm_registro.nro_doc} | Total_neto_new ADM: {total_neto_adm}", end=" → ")
-            # print(f"📄 ADM fila {fila_adm} | co_tipo_doc='{co_tipo_doc_adm}' | co_cli='{co_cli_adm}'", end=" → ")
-            # time.sleep(3)
-            # print(f"\n total_neto ADM: {total_neto_adm} | monto_con CON: {monto_con}", end=" → ")
-
             # 🎯 VERIFICAR MONTOS
             if total_neto_adm != monto_con:
                 # print(f"❌ Monto NO coincide (ADM.total_neto={total_neto_adm} vs CON.monto={monto_con})")
@@ -127,7 +117,6 @@ def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
                 continue
 
             # 🎯 VERIFICAR co_cli DENTRO de descri (misma lógica)
-            # print(f"🔍 Verificando si co_cli '{co_cli_adm}' está en '{descri_con}'", end=" → ")
             if co_cli_adm in descri_con:
                 # print("✅✅ COINCIDENCIA COMPLETA INVERSA!")
                 total_matches += 1
