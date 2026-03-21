@@ -42,14 +42,14 @@ def main():
         time.sleep(2)  # Simulación de proceso
 
         validate_match_advanced(lista_adm, lista_con)
-        # escribir_hoja_adm(EXCEL_FILE_RESULT_ADM_PATH, lista_adm)  # Guardar resultados en nueva hoja
+        escribir_hoja_adm(EXCEL_FILE_RESULT_ADM_PATH, lista_adm)  # Guardar resultados en nueva hoja
         time.sleep(2)
 
         print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE CON Y ADM...")
         time.sleep(2)  # Simulación de proceso
 
         validate_match_inverse(lista_con, lista_adm)
-        # escribir_hoja_con(EXCEL_FILE_RESULT_CON_PATH, lista_con)  # Guardar resultados en nueva hoja
+        escribir_hoja_con(EXCEL_FILE_RESULT_CON_PATH, lista_con)  # Guardar resultados en nueva hoja
         time.sleep(2)
 
     except KeyboardInterrupt:

@@ -15,46 +15,44 @@ def validate_match_advanced(lista_adm: List[AdmDto], lista_con: List[ConDto]):
     total_acc_saldo_new = 0.0
 
     # Crear diccionario para búsqueda O(1) en CON
-    # docref_index = {dto.docref: i+2 for i, dto in enumerate(lista_con)}  # fila Excel
     docref_index = {}
     for i, dto in enumerate(lista_con):
-        docref = str(int(float(dto.docref or 0))) + "/" + str(abs(float(dto.MontoD or dto.MontoH)))
-        if docref not in docref_index:  # Solo si NO existe aún
-            docref_index[docref] = i + 2
+        index = str(int(float(dto.docref or 0))) + "/" + str(abs(float(dto.MontoD or dto.MontoH)))
+        if index not in docref_index:
+            docref_index[index] = i + 2
 
     for idx_adm, adm in enumerate(lista_adm, 1):
-        co_tipo_doc = adm.co_tipo_doc.strip()
-        nro_doc = adm.nro_doc.strip()
-        co_cli = adm.co_cli.strip().upper()
-        total_neto = abs(adm.total_neto)
-        saldo_new = adm.saldo_new
+        co_tipo_doc_adm = adm.co_tipo_doc.strip()
+        nro_doc_adm = adm.nro_doc.strip()
+        co_cli_adm = adm.co_cli.strip().upper()
+        total_neto_adm = abs(adm.total_neto)
+        saldo_new_adm = adm.saldo_new
+        index_to_search = nro_doc_adm + "/" + str(total_neto_adm)
 
-        print(f"🔎 Evaluando ADM #{idx_adm:4d} | co_tipo_doc='{co_tipo_doc}' | nro_doc='{nro_doc}' | co_cli='{co_cli}'", end=" → ")
-
-        if co_tipo_doc == "ISLR":
-            # print(f"⏭️  Ignorado por tipo_doc 'ISLR' - {saldo_new}")
+        if co_tipo_doc_adm == "ISLR":
+            # print(f"⏭️  Ignorado por tipo_doc 'ISLR' - {saldo_new_adm}")
             total_no_matches += 1
             continue
 
-        if (nro_doc + "/" + str(abs(total_neto))) in docref_index:
-            fila_con = docref_index[nro_doc + "/" + str(abs(total_neto))]
-            con_registro = lista_con[fila_con - 2]  # Convertir fila Excel a índice Python
-            descri_con = str(con_registro.descri).upper()
-            monto_con = float(con_registro.MontoD or con_registro.MontoH)
+        if index_to_search in docref_index:
+            fila_con = docref_index[index_to_search]
+            registro_con = lista_con[fila_con - 2]  # Convertir fila Excel a índice Python
+            descrip_con = str(registro_con.descri).upper()
+            monto_con = float(registro_con.MontoD or registro_con.MontoH)
 
-            if (total_neto != monto_con):
-                print(f"❌ Monto NO coincide (ADM.total_neto={total_neto} vs CON.monto={monto_con})")
+            if (total_neto_adm != monto_con):
+                print(f"❌ Monto NO coincide (ADM.total_neto={total_neto_adm} vs CON.monto={monto_con})")
                 total_no_matches += 1
                 continue
 
-            # 🎯 VERIFICAR co_cli DENTRO de descri
-            if (co_cli in descri_con): # and (total_neto == monto_con):
+            # 🎯 VERIFICAR co_cli DENTRO de descrip
+            if (co_cli_adm in descrip_con):
                 print("✅✅ COINCIDENCIA COMPLETA!")
                 total_matches += 1
-                total_acc_saldo_new += saldo_new
+                total_acc_saldo_new += saldo_new_adm
                 adm.coincidence = fila_con
             else:
-                print(f"❌ co_cli '{co_cli}' NO en descri")
+                print(f"❌ co_cli '{co_cli_adm}' NO en descrip")
                 total_no_matches += 1
         else:
             print("❌ SIN coincidencia nro_doc")
@@ -93,23 +91,23 @@ def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
     # Crear diccionario INVERSO para búsqueda O(1) en ADM
     nro_doc_index = {}
     for i, dto in enumerate(lista_adm):
-        nro_doc = dto.nro_doc.strip() + "/" + str(abs(dto.total_neto_new))
-        if nro_doc not in nro_doc_index:  # Solo si NO existe aún
-            nro_doc_index[nro_doc] = i + 2  # fila Excel
+        index = dto.nro_doc.strip() + "/" + str(abs(dto.total_neto_new))
+        if index not in nro_doc_index:
+            nro_doc_index[index] = i + 2
 
     for idx_con, con in enumerate(lista_con, 1):  # idx_con = fila Excel CON
-        docref = con.docref.strip()
+        docref_con = con.docref.strip()
         monto_con = float(con.MontoD or con.MontoH)
-        descri_con = str(con.descri).upper()
-        index_to_search = str(int(float(docref or 0))) + "/" + str(monto_con)
+        descrip_con = str(con.descri).upper()
+        index_to_search = str(int(float(docref_con or 0))) + "/" + str(monto_con)
 
         if index_to_search in nro_doc_index:
             fila_adm = nro_doc_index[index_to_search]
-            adm_registro = lista_adm[fila_adm - 2]  # Convertir fila Excel a índice Python
-            total_neto_adm = abs(adm_registro.total_neto_new)
-            saldo_adm = adm_registro.saldo_new
-            co_cli_adm = adm_registro.co_cli.strip().upper()
-            # co_tipo_doc_adm = adm_registro.co_tipo_doc.strip()
+            registro_adm = lista_adm[fila_adm - 2]  # Convertir fila Excel a índice Python
+            total_neto_adm = abs(registro_adm.total_neto_new)
+            saldo_adm = registro_adm.saldo_new
+            co_cli_adm = registro_adm.co_cli.strip().upper()
+            # co_tipo_doc_adm = registro_adm.co_tipo_doc.strip()
 
             # 🎯 VERIFICAR MONTOS
             if total_neto_adm != monto_con:
@@ -117,14 +115,14 @@ def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
                 total_no_matches += 1
                 continue
 
-            # 🎯 VERIFICAR co_cli DENTRO de descri (misma lógica)
-            if co_cli_adm in descri_con:
+            # 🎯 VERIFICAR co_cli DENTRO de descrip (misma lógica)
+            if co_cli_adm in descrip_con:
                 # print("✅✅ COINCIDENCIA COMPLETA INVERSA!")
                 total_matches += 1
                 total_acc_saldo_new += saldo_adm
                 con.coincidence = fila_adm  # Marcar coincidencia inversa
             else:
-                # print(f"❌ co_cli '{co_cli_adm}' NO en descri CON")
+                # print(f"❌ co_cli '{co_cli_adm}' NO en descrip CON")
                 total_no_matches += 1
         else:
             # print("❌ SIN coincidencia docref → nro_doc")
