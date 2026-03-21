@@ -101,9 +101,10 @@ def validate_match_inverse(lista_con: List[ConDto], lista_adm: List[AdmDto]):
         docref = con.docref.strip()
         monto_con = float(con.MontoD or con.MontoH)
         descri_con = str(con.descri).upper()
+        index_to_search = str(int(float(docref or 0))) + "/" + str(monto_con)
 
-        if (docref + "/" + str(monto_con)) in nro_doc_index:
-            fila_adm = nro_doc_index[docref + "/" + str(monto_con)]
+        if index_to_search in nro_doc_index:
+            fila_adm = nro_doc_index[index_to_search]
             adm_registro = lista_adm[fila_adm - 2]  # Convertir fila Excel a índice Python
             total_neto_adm = abs(adm_registro.total_neto_new)
             saldo_adm = adm_registro.saldo_new
