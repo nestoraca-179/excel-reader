@@ -76,7 +76,7 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
             'nro_doc', 'co_tipo_doc', 'co_ven', 'co_cli', 'fec_emis', 'fec_venc',
             'anulado', 'tasa', 'total_neto', 'saldo', 'co_mone_doc', 'tasa_doc',
             'Rel_Inv', 'cli_des', 'observa', 'tipo_mov', 'Mon_Rep', 'Mon_Fil',
-            'total_neto_new', 'saldo_new', 'coincidencia'
+            'total_neto_new', 'saldo_new', 'coincidencia', 'row', 'con', 'equal'
         ]
 
         # Escribir cabeceras
@@ -149,6 +149,50 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
         print(f"❌ Error exportando Excel: {str(e)}")
         return None
 
+def leer_hoja_con(ruta_excel: str) -> List[ConDto]:
+    """Lee hoja CON y retorna lista de DTOs"""
+    df_con = None
+    try:
+        df_con = pd.read_excel(ruta_excel, sheet_name='CON', header=0)
+        print(f"📊 Hoja CON cargada: {len(df_con)} filas")
+
+        con_list: List[ConDto] = []
+        for _, row in df_con.iterrows():
+            dto = ConDto(
+                co_cue=str(row['co_cue']) if pd.notna(row['co_cue']) else '',
+                SaldoInicial=float(row['SaldoInicial']) if pd.notna(row['SaldoInicial']) else 0.0,
+                MontoD=float(row['MontoD']) if pd.notna(row['MontoD']) else 0.0,
+                MontoH=float(row['MontoH']) if pd.notna(row['MontoH']) else 0.0,
+                EsActivo=str(row['EsActivo']) if pd.notna(row['EsActivo']) else '',
+                EsPasivo=str(row['EsPasivo']) if pd.notna(row['EsPasivo']) else '',
+                EsCapital=str(row['EsCapital']) if pd.notna(row['EsCapital']) else '',
+                EsIngEgr=str(row['EsIngEgr']) if pd.notna(row['EsIngEgr']) else '',
+                EsAdicional=str(row['EsAdicional']) if pd.notna(row['EsAdicional']) else '',
+                detalle=str(row['detalle']) if pd.notna(row['detalle']) else '',
+                des_cue=str(row['des_cue']) if pd.notna(row['des_cue']) else '',
+                co_cuepadre=str(row['co_cuepadre']) if pd.notna(row['co_cuepadre']) else '',
+                NivelCuenta=str(row['NivelCuenta']) if pd.notna(row['NivelCuenta']) else '',
+                comp_num=str(row['comp_num']) if pd.notna(row['comp_num']) else '',
+                fec_emis=str(row['fec_emis']) if pd.notna(row['fec_emis']) else '',
+                descri=str(row['descri']) if pd.notna(row['descri']) else '',
+                reng_num=str(row['reng_num']) if pd.notna(row['reng_num']) else '',
+                docref=str(row['docref']) if pd.notna(row['docref']) else '',
+                IncluirAsiento=str(row['IncluirAsiento']) if pd.notna(row['IncluirAsiento']) else '',
+                SinCuentaMadre=str(row['SinCuentaMadre']) if pd.notna(row['SinCuentaMadre']) else '',
+                debe_new=float(row['debe_new']) if pd.notna(row['debe_new']) else 0.0,
+                haber_new=float(row['haber_new']) if pd.notna(row['haber_new']) else 0.0
+            )
+            con_list.append(dto)
+
+        return con_list
+
+    except FileNotFoundError:
+        print("❌ ERROR: Hoja CON no encontrada")
+        return []
+    except Exception as e:
+        print(f"❌ ERROR leyendo CON: {str(e)}")
+        return []
+
 def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
     """
     Exporta lista de ConDTO a Excel con formato profesional
@@ -165,7 +209,7 @@ def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
             'co_cue', 'SaldoInicial', 'MontoD', 'MontoH', 'EsActivo', 'EsPasivo',
             'EsCapital', 'EsIngEgr', 'EsAdicional', 'detalle', 'des_cue', 'co_cuepadre',
             'NivelCuenta', 'comp_num', 'fec_emis', 'descri', 'reng_num', 'docref',
-            'IncluirAsiento', 'SinCuentaMadre', 'debe_new', 'haber_new', 'coincidencia'
+            'IncluirAsiento', 'SinCuentaMadre', 'debe_new', 'haber_new', 'coincidencia', 'row', 'adm', 'equal'
         ]
 
         for col, header in enumerate(cabeceras, 1):
@@ -233,47 +277,3 @@ def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
     except Exception as e:
         print(f"❌ Error exportando Excel (CON): {str(e)}")
         return None
-
-def leer_hoja_con(ruta_excel: str) -> List[ConDto]:
-    """Lee hoja CON y retorna lista de DTOs"""
-    df_con = None
-    try:
-        df_con = pd.read_excel(ruta_excel, sheet_name='CON', header=0)
-        print(f"📊 Hoja CON cargada: {len(df_con)} filas")
-
-        con_list: List[ConDto] = []
-        for _, row in df_con.iterrows():
-            dto = ConDto(
-                co_cue=str(row['co_cue']) if pd.notna(row['co_cue']) else '',
-                SaldoInicial=float(row['SaldoInicial']) if pd.notna(row['SaldoInicial']) else 0.0,
-                MontoD=float(row['MontoD']) if pd.notna(row['MontoD']) else 0.0,
-                MontoH=float(row['MontoH']) if pd.notna(row['MontoH']) else 0.0,
-                EsActivo=str(row['EsActivo']) if pd.notna(row['EsActivo']) else '',
-                EsPasivo=str(row['EsPasivo']) if pd.notna(row['EsPasivo']) else '',
-                EsCapital=str(row['EsCapital']) if pd.notna(row['EsCapital']) else '',
-                EsIngEgr=str(row['EsIngEgr']) if pd.notna(row['EsIngEgr']) else '',
-                EsAdicional=str(row['EsAdicional']) if pd.notna(row['EsAdicional']) else '',
-                detalle=str(row['detalle']) if pd.notna(row['detalle']) else '',
-                des_cue=str(row['des_cue']) if pd.notna(row['des_cue']) else '',
-                co_cuepadre=str(row['co_cuepadre']) if pd.notna(row['co_cuepadre']) else '',
-                NivelCuenta=str(row['NivelCuenta']) if pd.notna(row['NivelCuenta']) else '',
-                comp_num=str(row['comp_num']) if pd.notna(row['comp_num']) else '',
-                fec_emis=str(row['fec_emis']) if pd.notna(row['fec_emis']) else '',
-                descri=str(row['descri']) if pd.notna(row['descri']) else '',
-                reng_num=str(row['reng_num']) if pd.notna(row['reng_num']) else '',
-                docref=str(row['docref']) if pd.notna(row['docref']) else '',
-                IncluirAsiento=str(row['IncluirAsiento']) if pd.notna(row['IncluirAsiento']) else '',
-                SinCuentaMadre=str(row['SinCuentaMadre']) if pd.notna(row['SinCuentaMadre']) else '',
-                debe_new=float(row['debe_new']) if pd.notna(row['debe_new']) else 0.0,
-                haber_new=float(row['haber_new']) if pd.notna(row['haber_new']) else 0.0
-            )
-            con_list.append(dto)
-
-        return con_list
-
-    except FileNotFoundError:
-        print("❌ ERROR: Hoja CON no encontrada")
-        return []
-    except Exception as e:
-        print(f"❌ ERROR leyendo CON: {str(e)}")
-        return []
