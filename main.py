@@ -3,10 +3,10 @@ from controller.ExcelController import *
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
 
-BASE_PATH = r"C:\Temp\ac\developer\python\excel-reader"
-EXCEL_FILE_PATH = rf"{BASE_PATH}\2022_test.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
-EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}\2022_test_result_adm.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
-EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}\2022_test_result_con.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+BASE_PATH = r"/home/developer/sources/AC/python/excel-reader"
+EXCEL_FILE_PATH = rf"{BASE_PATH}/2022_test.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}/2022_test_result_adm.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}/2022_test_result_con.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
 
 def main():
     print("🚀 LECTOR EXCEL ADM/CON - INICIANDO...")
@@ -33,6 +33,10 @@ def main():
         validate_fact_descriptions_v3(adm_list, con_list)
         validate_adel_descriptions_v2(adm_list, con_list)
         validate_ivan_descriptions(adm_list, con_list)
+        validate_islr_descriptions(adm_list, con_list)
+        validate_ajpm_descriptions(adm_list, con_list)
+        validate_ajnm_descriptions(adm_list, con_list)
+        validate_ncr_descriptions(adm_list, con_list)
         write_adm_sheet(EXCEL_FILE_RESULT_ADM_PATH, adm_list)
 
     except KeyboardInterrupt:

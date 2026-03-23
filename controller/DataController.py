@@ -364,13 +364,15 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
                 if token not in cobro_index:          # Guarda solo la primera aparición
                     cobro_index[token] = (idx + 2, con.descri)
             pos = found_pos + 1
-
+            
     # ✅ Lookup O(1) por cada ADEL × 11 candidatos
     for adm in adm_list:
         if (adm.co_tipo_doc or "").strip() != "ADEL":
             continue
 
         co_cli = adm.co_cli.strip().upper()
+        total_neto_new = adm.total_neto_new
+        saldo_new = adm.saldo_new
         observa = str(adm.observa or "").strip()
         nums = digit_pattern.findall(observa)
         if not nums:
@@ -380,8 +382,8 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
         width = len(nro_cobro_original)
         base_int = int(nro_cobro_original)
 
-        # Buscar entre los 10001 candidatos en el índice → O(10001) = O(1)
-        for inc in range(10001):
+        # Buscar entre los 11 candidatos en el índice → O(11) = O(1)
+        for inc in range(11):
             candidate = str(base_int + inc).zfill(width)
             if candidate in cobro_index:
                 fila_con, descri_original = cobro_index[candidate]
@@ -393,6 +395,11 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
                 adm.text_coincidence = descri_original
                 break
 
+        if not adm.has_coincidence and saldo_new < total_neto_new:
+            # Si no se encontró coincidencia pero el saldo_new es menor que total_neto_new, marcar como posible coincidencia para revisión manual
+            adm.has_coincidence = True
+
+# IN USE
 def validate_ivan_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
     """Para cada AdmDto con `co_tipo_doc == 'IVAN'`, forma 'VENT.<nro_doc>' y busca
     si aparece dentro del campo `descri` de algún objeto en `con_list`.
@@ -416,8 +423,8 @@ def validate_ivan_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
     ]
 
     for adm in ivan_adms:
-        nro_doc = (adm.nro_doc or "").strip()
-        ret_tag_upper = f"Retención de IVA N°:{nro_doc}"
+        nro_doc = (adm.nro_doc or "").strip().zfill(11)
+        ret_tag_upper = f"Retención de IVA N°:{nro_doc}".upper()
 
         # ✅ next() con generador: detiene en la primera coincidencia sin crear lista
         match = next(
@@ -434,3 +441,173 @@ def validate_ivan_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
             adm.has_coincidence = True
             adm.row_coincidence = fila_con
             adm.text_coincidence = descri_original
+
+# IN USE
+def validate_islr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
+    """Nueva versión que busca, para cada AdmDto con `co_tipo_doc == 'ISLR'`:
+    - extrae el número de cobro desde `adm.observa` (p. ej. '03000009650')
+    - extrae `co_cli` desde `adm.co_cli`
+    - busca en `con_list` un registro cuya `descri` contenga 'COBRO,<co_cli>',
+        cuyo `docref` corresponda al número de cobro y cuyo `haber_new` tenga
+        el mismo valor absoluto que `adm.total_neto`.
+
+    Al encontrar coincidencia marca `adm.has_coincidence`, `adm.row_coincidence`
+    y `adm.text_coincidence`.
+    """
+    print("\n" + "=" * 90)
+    print("🔎 VALIDACIÓN ISLR → DESCRI: buscar 'COBRO,<co_cli>' y docref/haber")
+    print("=" * 90)
+
+    PREFIX = "COBRO,"
+    digit_pattern = re.compile(r"\d+")
+
+    # Índice por docref (normalizado como entero en cadena) → lista de (fila, descri_upper, descri_original, con_obj)
+    docref_index: dict[str, list[tuple[int, str, any, ConDto]]] = {}
+    for idx, con in enumerate(con_list):
+        docref_raw = str(con.docref or "").strip()
+        try:
+            docref_norm = str(int(str_to_float_safe(docref_raw or 0)))
+        except Exception:
+            docref_norm = docref_raw
+
+        docref_index.setdefault(docref_norm, []).append(
+            (idx + 2, str(con.descri or "").upper(), con.descri, con)
+        )
+
+    # Iterar sobre adm_list y buscar coincidencias
+    for adm in adm_list:
+        if (adm.co_tipo_doc or "").strip() != "ISLR":
+            continue
+
+        co_cli = (adm.co_cli or "").strip().upper()
+        observa = str(adm.observa or "").strip()
+        nums = digit_pattern.findall(observa)
+        if not nums:
+            continue
+
+        nro_cobro_raw = nums[-1]
+        try:
+            nro_cobro_norm = str(int(nro_cobro_raw))
+        except Exception:
+            nro_cobro_norm = nro_cobro_raw
+
+        # Obtener candidatos por docref
+        candidates = docref_index.get(nro_cobro_norm, [])
+        if not candidates:
+            continue
+
+        pref_search = f"{PREFIX}{co_cli}"
+
+        # Iterar por índice para poder quitar candidatos usados (consumir coincidencias)
+        for ci, (fila_con, descri_upper, descri_original, con_obj) in enumerate(candidates):
+            # 1) descri contiene 'COBRO,<co_cli>'
+            if pref_search not in descri_upper:
+                continue
+
+            # 3) abs(adm.total_neto) == abs(con.haber_new)
+            try:
+                if abs(adm.total_neto) != abs(con_obj.haber_new):
+                    continue
+            except Exception:
+                continue
+
+            # Coincidencia encontrada: marcar y consumir este candidato para no reutilizarlo
+            adm.has_coincidence = True
+            adm.row_coincidence = fila_con
+            adm.text_coincidence = descri_original
+
+            # Eliminar el candidato utilizado de la lista en el índice
+            try:
+                docref_index[nro_cobro_norm].pop(ci)
+                # si lista queda vacía, eliminar la clave
+                if not docref_index[nro_cobro_norm]:
+                    del docref_index[nro_cobro_norm]
+            except Exception:
+                pass
+
+            break
+
+# IN USE
+def validate_ajpm_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
+    """Valida objetos `AJPM`:
+    - normaliza `nro_doc` a 11 caracteres con ceros a la izquierda
+    - busca en `con_list` si `descri` contiene 'Aju. Pos. Clie:<nro_doc>'
+    - al encontrar, marca `adm.has_coincidence`, `adm.row_coincidence`, `adm.text_coincidence`
+    """
+    print("\n" + "=" * 90)
+    print("🔎 VALIDACIÓN AJPM → DESCRI: buscar 'Aju. Pos. Clie:<nro_doc>'")
+    print("=" * 90)
+
+    for adm in adm_list:
+        if (adm.co_tipo_doc or "").strip() != "AJPM":
+            continue
+
+        nro_doc = str(adm.nro_doc or "").strip().zfill(11)
+        pref = f"Aju. Pos. Clie:{nro_doc}"
+        pref_upper = pref.upper()
+
+        for idx, con in enumerate(con_list, 1):
+            descri_upper = str(con.descri or "").upper()
+            if pref_upper in descri_upper:
+                fila_con = idx + 1
+                adm.has_coincidence = True
+                adm.row_coincidence = fila_con
+                adm.text_coincidence = con.descri
+                break
+
+# IN USE
+def validate_ajnm_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
+    """Valida objetos `AJNM`:
+    - normaliza `nro_doc` a 11 caracteres con ceros a la izquierda
+    - busca en `con_list` si `descri` contiene 'Aju. Neg. Clie:<nro_doc>'
+    - al encontrar, marca `adm.has_coincidence`, `adm.row_coincidence`, `adm.text_coincidence`
+    """
+    print("\n" + "=" * 90)
+    print("🔎 VALIDACIÓN AJNM → DESCRI: buscar 'Aju. Neg. Clie:<nro_doc>'")
+    print("=" * 90)
+
+    for adm in adm_list:
+        if (adm.co_tipo_doc or "").strip() != "AJNM":
+            continue
+
+        nro_doc = str(adm.nro_doc or "").strip().zfill(11)
+        pref = f"Aju. Neg. Clie:{nro_doc}"
+        pref_upper = pref.upper()
+
+        for idx, con in enumerate(con_list, 1):
+            descri_upper = str(con.descri or "").upper()
+            if pref_upper in descri_upper:
+                fila_con = idx + 1
+                adm.has_coincidence = True
+                adm.row_coincidence = fila_con
+                adm.text_coincidence = con.descri
+                break
+
+# IN USE
+def validate_ncr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
+    """Valida objetos `N/CR`:
+    - normaliza `nro_doc` a 11 caracteres con ceros a la izquierda
+    - busca en `con_list` si `descri` contiene 'N/CR2.<nro_doc>'
+    - al encontrar, marca `adm.has_coincidence`, `adm.row_coincidence`, `adm.text_coincidence`
+    """
+    print("\n" + "=" * 90)
+    print("🔎 VALIDACIÓN N/CR → DESCRI: buscar 'N/CR2.<nro_doc>'")
+    print("=" * 90)
+
+    for adm in adm_list:
+        if (adm.co_tipo_doc or "").strip() != "N/CR":
+            continue
+
+        nro_doc = str(adm.nro_doc or "").strip()
+        pref = f"N/CR2.{nro_doc}"
+        pref_upper = pref.upper()
+
+        for idx, con in enumerate(con_list, 1):
+            descri_upper = str(con.descri or "").upper()
+            if pref_upper in descri_upper:
+                fila_con = idx + 1
+                adm.has_coincidence = True
+                adm.row_coincidence = fila_con
+                adm.text_coincidence = con.descri
+                break
+
