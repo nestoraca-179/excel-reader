@@ -1,11 +1,4 @@
-"""
-Aplicación Consola - Lector Excel ADM/CON
-Analista de Datos & Data Scientist
-"""
-
-import time
-
-from controller.DataController import validate_match_advanced, validate_match_inverse
+from controller.DataController import *
 from controller.ExcelController import *
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
@@ -21,36 +14,26 @@ def main():
 
     try:
         # 1. Validar archivo
-        if not validar_archivo(EXCEL_FILE_PATH):
+        if not validate_file(EXCEL_FILE_PATH):
             return
 
         # 2. Leer hojas
-        lista_adm: List[AdmDto] = leer_hoja_adm(EXCEL_FILE_PATH)
-        lista_con: List[ConDto] = leer_hoja_con(EXCEL_FILE_PATH)
+        adm_list: List[AdmDto] = read_adm_sheet(EXCEL_FILE_PATH)
+        con_list: List[ConDto] = read_adm_con(EXCEL_FILE_PATH)
 
         # 3. Mostrar resumen
         print("\n" + "=" * 60)
         print("✅ PROCESAMIENTO COMPLETADO")
         print("=" * 60)
-        print(f"📋 Total registros ADM: {len(lista_adm):,}")
-        print(f"📋 Total registros CON: {len(lista_con):,}")
-        print(f"📊 Total registros: {len(lista_adm) + len(lista_con):,}")
+        print(f"📋 Total registros ADM: {len(adm_list):,}")
+        print(f"📋 Total registros CON: {len(con_list):,}")
+        print(f"📊 Total registros: {len(adm_list) + len(con_list):,}")
         print("\n🎉 DTOs listos para usar en análisis/data science!")
 
-        # 4. Buscando coincidencias
-        print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE ADM Y CON...")
-        time.sleep(2)  # Simulación de proceso
-
-        validate_match_advanced(lista_adm, lista_con)
-        escribir_hoja_adm(EXCEL_FILE_RESULT_ADM_PATH, lista_adm)  # Guardar resultados en nueva hoja
-        time.sleep(2)
-
-        print("\n🔍 BUSCANDO COINCIDENCIAS ENTRE CON Y ADM...")
-        time.sleep(2)  # Simulación de proceso
-
-        validate_match_inverse(lista_con, lista_adm)
-        escribir_hoja_con(EXCEL_FILE_RESULT_CON_PATH, lista_con)  # Guardar resultados en nueva hoja
-        time.sleep(2)
+        validate_fact_descriptions_v3(adm_list, con_list)
+        validate_adel_descriptions_v2(adm_list, con_list)
+        validate_ivan_descriptions(adm_list, con_list)
+        write_adm_sheet(EXCEL_FILE_RESULT_ADM_PATH, adm_list)
 
     except KeyboardInterrupt:
         print("\n⏹️  Proceso interrumpido por usuario")

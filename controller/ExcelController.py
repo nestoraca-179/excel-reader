@@ -1,14 +1,15 @@
 import os
-import pandas as pd
 from typing import List
+
+import pandas as pd
+from openpyxl import Workbook
+from openpyxl.styles import Border, Font, PatternFill, Side
+
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
 
-from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill
-from openpyxl.utils.dataframe import dataframe_to_rows
 
-def validar_archivo(ruta: str) -> bool:
+def validate_file(ruta: str) -> bool:
     """Valida si el archivo Excel existe"""
     if not os.path.exists(ruta):
         print(f"❌ ERROR: Archivo no encontrado: {ruta}")
@@ -16,7 +17,7 @@ def validar_archivo(ruta: str) -> bool:
     print(f"✅ Archivo encontrado: {ruta}")
     return True
 
-def leer_hoja_adm(ruta_excel: str) -> List[AdmDto]:
+def read_adm_sheet(ruta_excel: str) -> List[AdmDto]:
     """Lee hoja ADM y retorna lista de DTOs"""
     df_adm = None
     try:
@@ -58,13 +59,13 @@ def leer_hoja_adm(ruta_excel: str) -> List[AdmDto]:
         print(f"❌ ERROR leyendo ADM: {str(e)}")
         return []
 
-def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
+def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
     """
     Exporta lista de AdmDTO a Excel con formato profesional
     Hoja: 'RESULTADO_ADM'
     """
     try:
-        print(f"\n📤 Exportando {len(lista_adm):,} AdmDTOs a Excel...")
+        print(f"\n📤 Exportando {len(adm_list):,} AdmDTOs a Excel...")
 
         # Crear workbook
         wb = Workbook()
@@ -76,7 +77,7 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
             'nro_doc', 'co_tipo_doc', 'co_ven', 'co_cli', 'fec_emis', 'fec_venc',
             'anulado', 'tasa', 'total_neto', 'saldo', 'co_mone_doc', 'tasa_doc',
             'Rel_Inv', 'cli_des', 'observa', 'tipo_mov', 'Mon_Rep', 'Mon_Fil',
-            'total_neto_new', 'saldo_new', 'coincidencia', 'row', 'con', 'equal'
+            'total_neto_new', 'saldo_new', 'has_coincidence', 'row_coincidence', 'text_coincidence'
         ]
 
         # Escribir cabeceras
@@ -86,7 +87,7 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
             cell.fill = PatternFill(start_color="3673A5", end_color="3673A5", fill_type="solid")
 
         # 2. DATOS
-        for fila, adm in enumerate(lista_adm, 2):  # Fila 2 en adelante
+        for fila, adm in enumerate(adm_list, 2):  # Fila 2 en adelante
             ws.cell(row=fila, column=1, value=adm.nro_doc)
             ws.cell(row=fila, column=2, value=adm.co_tipo_doc)
             ws.cell(row=fila, column=3, value=adm.co_ven)
@@ -107,7 +108,9 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
             ws.cell(row=fila, column=18, value=adm.Mon_Fil)
             ws.cell(row=fila, column=19, value=adm.total_neto_new)
             ws.cell(row=fila, column=20, value=adm.saldo_new)
-            ws.cell(row=fila, column=21, value=adm.coincidence)
+            ws.cell(row=fila, column=21, value=adm.has_coincidence)
+            ws.cell(row=fila, column=22, value=adm.row_coincidence)
+            ws.cell(row=fila, column=23, value=adm.text_coincidence)
 
         # 3. FORMATO PROFESIONAL
         # Ajustar ancho columnas
@@ -124,7 +127,6 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
             ws.column_dimensions[column_letter].width = adjusted_width
 
         # Bordes
-        from openpyxl.styles import Border, Side
         thin_border = Border(
             left=Side(style='thin'),
             right=Side(style='thin'),
@@ -132,15 +134,15 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
             bottom=Side(style='thin')
         )
 
-        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=20):
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=23):
             for cell in row:
                 cell.border = thin_border
 
         # 4. GUARDAR
         wb.save(ruta_excel)
         print(f"✅ EXCEL CREADO: '{ruta_excel}'")
-        print(f"   📊 Filas: {len(lista_adm):,}")
-        print(f"   📋 Columnas: 20")
+        print(f"   📊 Filas: {len(adm_list):,}")
+        print(f"   📋 Columnas: 23")
         print(f"   🎨 Hoja: RESULTADO_ADM")
 
         return ruta_excel
@@ -149,7 +151,7 @@ def escribir_hoja_adm(ruta_excel: str, lista_adm: List[AdmDto]):
         print(f"❌ Error exportando Excel: {str(e)}")
         return None
 
-def leer_hoja_con(ruta_excel: str) -> List[ConDto]:
+def read_adm_con(ruta_excel: str) -> List[ConDto]:
     """Lee hoja CON y retorna lista de DTOs"""
     df_con = None
     try:
@@ -193,13 +195,13 @@ def leer_hoja_con(ruta_excel: str) -> List[ConDto]:
         print(f"❌ ERROR leyendo CON: {str(e)}")
         return []
 
-def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
+def write_adm_con(ruta_excel: str, con_list: List[ConDto]):
     """
     Exporta lista de ConDTO a Excel con formato profesional
     Hoja: 'RESULTADO_CON'
     """
     try:
-        print(f"\n📤 Exportando {len(lista_con):,} ConDTOs a Excel...")
+        print(f"\n📤 Exportando {len(con_list):,} ConDTOs a Excel...")
 
         wb = Workbook()
         ws = wb.active
@@ -209,7 +211,7 @@ def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
             'co_cue', 'SaldoInicial', 'MontoD', 'MontoH', 'EsActivo', 'EsPasivo',
             'EsCapital', 'EsIngEgr', 'EsAdicional', 'detalle', 'des_cue', 'co_cuepadre',
             'NivelCuenta', 'comp_num', 'fec_emis', 'descri', 'reng_num', 'docref',
-            'IncluirAsiento', 'SinCuentaMadre', 'debe_new', 'haber_new', 'coincidencia', 'row', 'adm', 'equal'
+            'IncluirAsiento', 'SinCuentaMadre', 'debe_new', 'haber_new'
         ]
 
         for col, header in enumerate(cabeceras, 1):
@@ -217,7 +219,7 @@ def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = PatternFill(start_color="3673A5", end_color="3673A5", fill_type="solid")
 
-        for fila, con in enumerate(lista_con, 2):
+        for fila, con in enumerate(con_list, 2):
             ws.cell(row=fila, column=1, value=con.co_cue)
             ws.cell(row=fila, column=2, value=con.SaldoInicial)
             ws.cell(row=fila, column=3, value=con.MontoD)
@@ -240,7 +242,6 @@ def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
             ws.cell(row=fila, column=20, value=con.SinCuentaMadre)
             ws.cell(row=fila, column=21, value=con.debe_new)
             ws.cell(row=fila, column=22, value=con.haber_new)
-            ws.cell(row=fila, column=23, value=getattr(con, 'coincidence', None))
 
         for column in ws.columns:
             max_length = 0
@@ -268,7 +269,7 @@ def escribir_hoja_con(ruta_excel: str, lista_con: List[ConDto]):
 
         wb.save(ruta_excel)
         print(f"✅ EXCEL CREADO: '{ruta_excel}'")
-        print(f"   📊 Filas: {len(lista_con):,}")
+        print(f"   📊 Filas: {len(con_list):,}")
         print(f"   📋 Columnas: {len(cabeceras)}")
         print(f"   🎨 Hoja: RESULTADO_CON")
 

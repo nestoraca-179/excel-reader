@@ -23,4 +23,8 @@ class AdmDto:
     Mon_Fil: float
     total_neto_new: float
     saldo_new: float
-    coincidence: int = 0  # Campo adicional para marcar coincidencias
+
+    # Aditional fields for processing (not from Excel)
+    has_coincidence: bool = False
+    row_coincidence: int = None
+    text_coincidence: str = None

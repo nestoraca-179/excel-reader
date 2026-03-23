@@ -25,4 +25,3 @@ class ConDto:
     SinCuentaMadre: str
     debe_new: float
     haber_new: float
-    coincidence: int = 0  # Campo adicional para marcar coincidencias
