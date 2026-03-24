@@ -363,15 +363,15 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
                 if token not in cobro_index:          # Guarda solo la primera aparición
                     cobro_index[token] = (idx + 2, con.descri)
             pos = found_pos + 1
-            
+
     # ✅ Lookup O(1) por cada ADEL × 11 candidatos
     for adm in adm_list:
         if (adm.co_tipo_doc or "").strip() != "ADEL":
             continue
 
         co_cli = adm.co_cli.strip().upper()
-        total_neto_new = adm.total_neto_new
-        saldo_new = adm.saldo_new
+        total_neto_new = adm.total_neto
+        saldo_new = adm.saldo
         observa = str(adm.observa or "").strip()
         nums = digit_pattern.findall(observa)
         if not nums:
