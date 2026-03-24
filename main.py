@@ -3,10 +3,10 @@ from controller.ExcelController import *
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
 
-BASE_PATH = r"C:\Temp\ac\developer\python\excel-reader"
-EXCEL_FILE_PATH = rf"{BASE_PATH}\2023_test.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
-EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}\2023_test_result_adm.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
-EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}\2023_test_result_con.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+BASE_PATH = r"/home/developer/sources/AC/python/excel-reader"
+EXCEL_FILE_PATH = rf"{BASE_PATH}/2023_test.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}/2023_test_result_adm.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}/2023_test_result_con.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
 
 def main():
     print("🚀 LECTOR EXCEL ADM/CON - INICIANDO...")
@@ -19,7 +19,7 @@ def main():
 
         # 2. Leer hojas
         adm_list: List[AdmDto] = read_adm_sheet(EXCEL_FILE_PATH)
-        con_list: List[ConDto] = read_adm_con(EXCEL_FILE_PATH)
+        con_list: List[ConDto] = read_con_sheet(EXCEL_FILE_PATH)
 
         # 3. Mostrar resumen
         print("\n" + "=" * 60)
@@ -37,6 +37,7 @@ def main():
         validate_ajpm_descriptions(adm_list, con_list)
         validate_ajnm_descriptions(adm_list, con_list)
         validate_ncr_descriptions(adm_list, con_list)
+        validate_ndb_descriptions(adm_list, con_list)
         write_adm_sheet(EXCEL_FILE_RESULT_ADM_PATH, adm_list)
 
     except KeyboardInterrupt:

@@ -610,3 +610,30 @@ def validate_ncr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
                 adm.text_coincidence = con.descri
                 break
 
+# IN USE
+def validate_ndb_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
+    """Valida objetos `N/DB`:
+    - normaliza `nro_doc` a 11 caracteres con ceros a la izquierda
+    - busca en `con_list` si `descri` contiene 'N/DB2.<nro_doc>'
+    - al encontrar, marca `adm.has_coincidence`, `adm.row_coincidence`, `adm.text_coincidence`
+    """
+    print("\n" + "=" * 90)
+    print("🔎 VALIDACIÓN N/DB → DESCRI: buscar 'N/DB2.<nro_doc>'")
+    print("=" * 90)
+
+    for adm in adm_list:
+        if (adm.co_tipo_doc or "").strip() != "N/DB":
+            continue
+
+        nro_doc = str(adm.nro_doc or "").strip().zfill(11)
+        pref = f"N/DB2.{nro_doc}"
+        pref_upper = pref.upper()
+
+        for idx, con in enumerate(con_list, 1):
+            descri_upper = str(con.descri or "").upper()
+            if pref_upper in descri_upper:
+                fila_con = idx + 1
+                adm.has_coincidence = True
+                adm.row_coincidence = fila_con
+                adm.text_coincidence = con.descri
+                break

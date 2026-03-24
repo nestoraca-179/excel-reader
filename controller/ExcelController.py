@@ -151,7 +151,7 @@ def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
         print(f"❌ Error exportando Excel: {str(e)}")
         return None
 
-def read_adm_con(ruta_excel: str) -> List[ConDto]:
+def read_con_sheet(ruta_excel: str) -> List[ConDto]:
     """Lee hoja CON y retorna lista de DTOs"""
     df_con = None
     try:
@@ -195,7 +195,7 @@ def read_adm_con(ruta_excel: str) -> List[ConDto]:
         print(f"❌ ERROR leyendo CON: {str(e)}")
         return []
 
-def write_adm_con(ruta_excel: str, con_list: List[ConDto]):
+def write_con_sheet(ruta_excel: str, con_list: List[ConDto]):
     """
     Exporta lista de ConDTO a Excel con formato profesional
     Hoja: 'RESULTADO_CON'
