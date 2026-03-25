@@ -479,6 +479,8 @@ def validate_islr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
             continue
 
         co_cli = (adm.co_cli or "").strip().upper()
+        total_neto_new = adm.total_neto
+        saldo_new = adm.saldo
         observa = str(adm.observa or "").strip()
         nums = digit_pattern.findall(observa)
         if not nums:
@@ -525,6 +527,10 @@ def validate_islr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
                 pass
 
             break
+
+        if not adm.has_coincidence and saldo_new < total_neto_new:
+            # Si no se encontró coincidencia pero el saldo_new es menor que total_neto_new, marcar como posible coincidencia para revisión manual
+            adm.has_coincidence = True
 
 # IN USE
 def validate_ajpm_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
