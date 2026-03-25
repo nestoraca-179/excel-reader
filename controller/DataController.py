@@ -494,7 +494,7 @@ def validate_islr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
 
         # Obtener candidatos por docref
         candidates = docref_index.get(nro_cobro_norm, [])
-        if not candidates:
+        if not candidates and observa.startswith("COBRO"):
             continue
 
         pref_search = f"{PREFIX}{co_cli}"
