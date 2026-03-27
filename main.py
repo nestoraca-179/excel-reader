@@ -4,9 +4,9 @@ from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
 
 BASE_PATH = r"/home/developer/sources/AC/python/excel-reader"
-EXCEL_FILE_PATH = rf"{BASE_PATH}/2024_test.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
-EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}/2024_test_result_adm.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
-EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}/2024_test_result_con.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_PATH = rf"{BASE_PATH}/2022_test.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}/2022_test_result_adm.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
+EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}/2022_test_result_con.xlsx"  # ← **ESPECIFICA TU RUTA AQUÍ**
 
 def main():
     print("🚀 LECTOR EXCEL ADM/CON - INICIANDO...")

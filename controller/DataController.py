@@ -394,7 +394,7 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
                 adm.text_coincidence = descri_original
                 break
 
-        if not adm.has_coincidence and saldo_new < total_neto_new:
+        if not adm.has_coincidence and abs(saldo_new) < abs(total_neto_new):
             # Si no se encontró coincidencia pero el saldo_new es menor que total_neto_new, marcar como posible coincidencia para revisión manual
             adm.has_coincidence = True
 
@@ -528,7 +528,7 @@ def validate_islr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
 
             break
 
-        if not adm.has_coincidence and saldo_new < total_neto_new:
+        if not adm.has_coincidence and abs(saldo_new) < abs(total_neto_new):
             # Si no se encontró coincidencia pero el saldo_new es menor que total_neto_new, marcar como posible coincidencia para revisión manual
             adm.has_coincidence = True
 
