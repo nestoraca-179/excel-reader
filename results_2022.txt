@@ -1,0 +1,2 @@
+result CON: 12,206,333.37
+result ADM: 12,679,569.89 (processed)
