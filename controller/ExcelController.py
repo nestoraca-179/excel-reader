@@ -8,7 +8,6 @@ from openpyxl.styles import Border, Font, PatternFill, Side
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
 
-
 def validate_file(ruta: str) -> bool:
     """Valida si el archivo Excel existe"""
     if not os.path.exists(ruta):
