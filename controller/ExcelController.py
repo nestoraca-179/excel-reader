@@ -1,5 +1,6 @@
 import os
 from typing import List
+from pathlib import Path
 
 import pandas as pd
 from openpyxl import Workbook
@@ -16,11 +17,11 @@ def validate_file(ruta: str) -> bool:
     print(f"✅ Archivo encontrado: {ruta}")
     return True
 
-def read_adm_sheet(ruta_excel: str) -> List[AdmDto]:
+def read_adm_sheet(excel_path: str) -> List[AdmDto]:
     """Lee hoja ADM y retorna lista de DTOs"""
     df_adm = None
     try:
-        df_adm = pd.read_excel(ruta_excel, sheet_name='ADM', header=0)
+        df_adm = pd.read_excel(excel_path, sheet_name='ADM', header=0)
         print(f"📊 Hoja ADM cargada: {len(df_adm)} filas")
 
         adm_list: List[AdmDto] = []
@@ -58,10 +59,10 @@ def read_adm_sheet(ruta_excel: str) -> List[AdmDto]:
         print(f"❌ ERROR leyendo ADM: {str(e)}")
         return []
 
-def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
+def write_adm_sheet(excel_path: str, adm_list: List[AdmDto]):
     """
     Exporta lista de AdmDTO a Excel con formato profesional
-    Hoja: 'RESULTADO_ADM'
+    Hoja: 'DIFF'
     """
     try:
         print(f"\n📤 Exportando {len(adm_list):,} AdmDTOs a Excel...")
@@ -69,7 +70,7 @@ def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
         # Crear workbook
         wb = Workbook()
         ws = wb.active
-        ws.title = "RESULTADO_ADM"
+        ws.title = "DIFF"
 
         # 1. CABECERAS
         headers = [
@@ -137,24 +138,28 @@ def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
             for cell in row:
                 cell.border = thin_border
 
-        # 4. GUARDAR
-        wb.save(ruta_excel)
-        print(f"✅ EXCEL CREADO: '{ruta_excel}'")
+        # VERIFICAR RUTA (Y CREAR EN CASO DE QUE NO EXISTA)
+        destination_folder = Path(excel_path).parent
+        destination_folder.mkdir(parents=True, exist_ok=True)
+
+        # 5. GUARDAR
+        wb.save(excel_path)
+        print(f"✅ EXCEL CREADO: '{excel_path}'")
         print(f"   📊 Filas: {len(adm_list):,}")
         print(f"   📋 Columnas: 23")
-        print(f"   🎨 Hoja: RESULTADO_ADM")
+        print(f"   🎨 Hoja: DIFF")
 
-        return ruta_excel
+        return excel_path
 
     except Exception as e:
         print(f"❌ Error exportando Excel: {str(e)}")
         return None
 
-def read_con_sheet(ruta_excel: str) -> List[ConDto]:
+def read_con_sheet(excel_path: str) -> List[ConDto]:
     """Lee hoja CON y retorna lista de DTOs"""
     df_con = None
     try:
-        df_con = pd.read_excel(ruta_excel, sheet_name='CON', header=0)
+        df_con = pd.read_excel(excel_path, sheet_name='CON', header=0)
         print(f"📊 Hoja CON cargada: {len(df_con)} filas")
 
         con_list: List[ConDto] = []
@@ -194,17 +199,17 @@ def read_con_sheet(ruta_excel: str) -> List[ConDto]:
         print(f"❌ ERROR leyendo CON: {str(e)}")
         return []
 
-def write_con_sheet(ruta_excel: str, con_list: List[ConDto]):
+def write_con_sheet(excel_path: str, con_list: List[ConDto]):
     """
     Exporta lista de ConDTO a Excel con formato profesional
-    Hoja: 'RESULTADO_CON'
+    Hoja: 'DIFF'
     """
     try:
         print(f"\n📤 Exportando {len(con_list):,} ConDTOs a Excel...")
 
         wb = Workbook()
         ws = wb.active
-        ws.title = "RESULTADO_CON"
+        ws.title = "DIFF"
 
         headers = [
             'co_cue', 'SaldoInicial', 'MontoD', 'MontoH', 'EsActivo', 'EsPasivo',
@@ -266,13 +271,13 @@ def write_con_sheet(ruta_excel: str, con_list: List[ConDto]):
             for cell in row:
                 cell.border = thin_border
 
-        wb.save(ruta_excel)
-        print(f"✅ EXCEL CREADO: '{ruta_excel}'")
+        wb.save(excel_path)
+        print(f"✅ EXCEL CREADO: '{excel_path}'")
         print(f"   📊 Filas: {len(con_list):,}")
         print(f"   📋 Columnas: {len(headers)}")
-        print(f"   🎨 Hoja: RESULTADO_CON")
+        print(f"   🎨 Hoja: DIFF")
 
-        return ruta_excel
+        return excel_path
 
     except Exception as e:
         print(f"❌ Error exportando Excel (CON): {str(e)}")
