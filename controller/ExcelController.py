@@ -72,7 +72,7 @@ def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
         ws.title = "RESULTADO_ADM"
 
         # 1. CABECERAS
-        cabeceras = [
+        headers = [
             'nro_doc', 'co_tipo_doc', 'co_ven', 'co_cli', 'fec_emis', 'fec_venc',
             'anulado', 'tasa', 'total_neto', 'saldo', 'co_mone_doc', 'tasa_doc',
             'Rel_Inv', 'cli_des', 'observa', 'tipo_mov', 'Mon_Rep', 'Mon_Fil',
@@ -80,7 +80,7 @@ def write_adm_sheet(ruta_excel: str, adm_list: List[AdmDto]):
         ]
 
         # Escribir cabeceras
-        for col, header in enumerate(cabeceras, 1):
+        for col, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = PatternFill(start_color="3673A5", end_color="3673A5", fill_type="solid")
@@ -206,14 +206,14 @@ def write_con_sheet(ruta_excel: str, con_list: List[ConDto]):
         ws = wb.active
         ws.title = "RESULTADO_CON"
 
-        cabeceras = [
+        headers = [
             'co_cue', 'SaldoInicial', 'MontoD', 'MontoH', 'EsActivo', 'EsPasivo',
             'EsCapital', 'EsIngEgr', 'EsAdicional', 'detalle', 'des_cue', 'co_cuepadre',
             'NivelCuenta', 'comp_num', 'fec_emis', 'descri', 'reng_num', 'docref',
             'IncluirAsiento', 'SinCuentaMadre', 'debe_new', 'haber_new'
         ]
 
-        for col, header in enumerate(cabeceras, 1):
+        for col, header in enumerate(headers, 1):
             cell = ws.cell(row=1, column=col, value=header)
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = PatternFill(start_color="3673A5", end_color="3673A5", fill_type="solid")
@@ -269,7 +269,7 @@ def write_con_sheet(ruta_excel: str, con_list: List[ConDto]):
         wb.save(ruta_excel)
         print(f"✅ EXCEL CREADO: '{ruta_excel}'")
         print(f"   📊 Filas: {len(con_list):,}")
-        print(f"   📋 Columnas: {len(cabeceras)}")
+        print(f"   📋 Columnas: {len(headers)}")
         print(f"   🎨 Hoja: RESULTADO_CON")
 
         return ruta_excel
