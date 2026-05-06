@@ -21,7 +21,34 @@ def read_adm_sheet(excel_path: str) -> List[AdmDto]:
     """Lee hoja ADM y retorna lista de DTOs"""
     df_adm = None
     try:
-        df_adm = pd.read_excel(excel_path, sheet_name='ADM', header=0)
+        # Converter to preserve leading zeros and avoid '.0' when pandas casts numeric cells
+        def _to_str_preserve(x):
+            if pd.isna(x):
+                return ''
+            try:
+                # Floats that are integers should be shown without .0
+                if isinstance(x, float):
+                    if x.is_integer():
+                        return str(int(x))
+                    return str(x)
+                return str(x)
+            except Exception:
+                return str(x)
+
+        converters = {
+            'nro_doc': _to_str_preserve,
+            'co_tipo_doc': _to_str_preserve,
+            'co_ven': _to_str_preserve,
+            'co_cli': _to_str_preserve,
+            'co_mone_doc': _to_str_preserve,
+            'Rel_Inv': _to_str_preserve,
+            'cli_des': _to_str_preserve,
+            'observa': _to_str_preserve,
+            'tipo_mov': _to_str_preserve,
+            'Mon_Rep': _to_str_preserve
+        }
+
+        df_adm = pd.read_excel(excel_path, sheet_name='ADM', header=0, converters=converters, engine='openpyxl')
         print(f"📊 Hoja ADM cargada: {len(df_adm)} filas")
 
         adm_list: List[AdmDto] = []

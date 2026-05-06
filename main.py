@@ -5,9 +5,9 @@ from models.ConDTO import ConDto
 
 BASE_PATH = r"C:\Temp\ac\developer\python\excel-reader"
 EXCEL_FILE_PATH = rf"{BASE_PATH}\file.xlsx"  # ← **SPECIFY YOUR PATH HERE**
-COMPANY_NAME = "ISH"
-YEAR = 2025
-TYPE = "SALES"
+COMPANY_NAME = "ITL"
+YEAR = 2022
+TYPE = "PURCHASE"
 EXCEL_FILE_RESULT_ADM_PATH = rf"{BASE_PATH}\results\{COMPANY_NAME}\{YEAR}\{TYPE}_result_adm.xlsx"  # ← **SPECIFY YOUR PATH HERE**
 EXCEL_FILE_RESULT_CON_PATH = rf"{BASE_PATH}\results\{COMPANY_NAME}\{YEAR}\{TYPE}_result_con.xlsx"  # ← **SPECIFY YOUR PATH HERE**
 
