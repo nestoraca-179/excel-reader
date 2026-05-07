@@ -38,11 +38,11 @@ def read_adm_sheet(excel_path: str) -> List[AdmDto]:
         converters = {
             'nro_doc': _to_str_preserve,
             'co_tipo_doc': _to_str_preserve,
-            'co_ven': _to_str_preserve,
-            'co_cli': _to_str_preserve,
+            'nro_fact': _to_str_preserve,
+            'co_prov': _to_str_preserve,
             'co_mone_doc': _to_str_preserve,
             'Rel_Inv': _to_str_preserve,
-            'cli_des': _to_str_preserve,
+            'prov_des': _to_str_preserve,
             'observa': _to_str_preserve,
             'tipo_mov': _to_str_preserve,
             'Mon_Rep': _to_str_preserve
@@ -56,8 +56,8 @@ def read_adm_sheet(excel_path: str) -> List[AdmDto]:
             dto = AdmDto(
                 nro_doc=str(row['nro_doc']) if pd.notna(row['nro_doc']) else '',
                 co_tipo_doc=str(row['co_tipo_doc']) if pd.notna(row['co_tipo_doc']) else '',
-                co_ven=str(row['co_ven']) if pd.notna(row['co_ven']) else '',
-                co_cli=str(row['co_cli']) if pd.notna(row['co_cli']) else '',
+                nro_fact=str(row['nro_fact']) if pd.notna(row['nro_fact']) else '',
+                co_prov=str(row['co_prov']) if pd.notna(row['co_prov']) else '',
                 fec_emis=str(row['fec_emis']) if pd.notna(row['fec_emis']) else '',
                 fec_venc=str(row['fec_venc']) if pd.notna(row['fec_venc']) else '',
                 anulado=str(row['anulado']) if pd.notna(row['anulado']) else '',
@@ -67,7 +67,7 @@ def read_adm_sheet(excel_path: str) -> List[AdmDto]:
                 co_mone_doc=str(row['co_mone_doc']) if pd.notna(row['co_mone_doc']) else '',
                 tasa_doc=float(row['tasa_doc']) if pd.notna(row['tasa_doc']) else 0.0,
                 Rel_Inv=str(row['Rel_Inv']) if pd.notna(row['Rel_Inv']) else '',
-                cli_des=str(row['cli_des']) if pd.notna(row['cli_des']) else '',
+                prov_des=str(row['prov_des']) if pd.notna(row['prov_des']) else '',
                 observa=str(row['observa']) if pd.notna(row['observa']) else '',
                 tipo_mov=str(row['tipo_mov']) if pd.notna(row['tipo_mov']) else '',
                 Mon_Rep=str(row['Mon_Rep']) if pd.notna(row['Mon_Rep']) else '',
@@ -101,9 +101,9 @@ def write_adm_sheet(excel_path: str, adm_list: List[AdmDto]):
 
         # 1. CABECERAS
         headers = [
-            'nro_doc', 'co_tipo_doc', 'co_ven', 'co_cli', 'fec_emis', 'fec_venc',
+            'nro_doc', 'co_tipo_doc', 'nro_fact', 'co_prov', 'fec_emis', 'fec_venc',
             'anulado', 'tasa', 'total_neto', 'saldo', 'co_mone_doc', 'tasa_doc',
-            'Rel_Inv', 'cli_des', 'observa', 'tipo_mov', 'Mon_Rep', 'Mon_Fil',
+            'Rel_Inv', 'prov_des', 'observa', 'tipo_mov', 'Mon_Rep', 'Mon_Fil',
             'total_neto_new', 'saldo_new', 'has_coincidence', 'row_coincidence', 'text_coincidence'
         ]
 
@@ -117,8 +117,8 @@ def write_adm_sheet(excel_path: str, adm_list: List[AdmDto]):
         for fila, adm in enumerate(adm_list, 2):  # Fila 2 en adelante
             ws.cell(row=fila, column=1, value=adm.nro_doc)
             ws.cell(row=fila, column=2, value=adm.co_tipo_doc)
-            ws.cell(row=fila, column=3, value=adm.co_ven)
-            ws.cell(row=fila, column=4, value=adm.co_cli)
+            ws.cell(row=fila, column=3, value=adm.nro_fact)
+            ws.cell(row=fila, column=4, value=adm.co_prov)
             ws.cell(row=fila, column=5, value=adm.fec_emis)
             ws.cell(row=fila, column=6, value=adm.fec_venc)
             ws.cell(row=fila, column=7, value=adm.anulado)
@@ -128,7 +128,7 @@ def write_adm_sheet(excel_path: str, adm_list: List[AdmDto]):
             ws.cell(row=fila, column=11, value=adm.co_mone_doc)
             ws.cell(row=fila, column=12, value=adm.tasa_doc)
             ws.cell(row=fila, column=13, value=adm.Rel_Inv)
-            ws.cell(row=fila, column=14, value=adm.cli_des)
+            ws.cell(row=fila, column=14, value=adm.prov_des)
             ws.cell(row=fila, column=15, value=adm.observa)
             ws.cell(row=fila, column=16, value=adm.tipo_mov)
             ws.cell(row=fila, column=17, value=adm.Mon_Rep)

@@ -5,8 +5,8 @@ class AdmDto:
     """DTO para hoja ADM"""
     nro_doc: str
     co_tipo_doc: str
-    co_ven: str
-    co_cli: str
+    nro_fact: str
+    co_prov: str
     fec_emis: str
     fec_venc: str
     anulado: str
@@ -16,7 +16,7 @@ class AdmDto:
     co_mone_doc: str
     tasa_doc: float
     Rel_Inv: str
-    cli_des: str
+    prov_des: str
     observa: str
     tipo_mov: str
     Mon_Rep: float
