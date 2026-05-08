@@ -68,3 +68,7 @@ Thumbs.db
 
 # Sensitive files - add any project-specific secrets here
 # secrets.yaml
+
+# Results folder
+file.xlsx
+results/
