@@ -70,5 +70,5 @@ Thumbs.db
 # secrets.yaml
 
 # Results folder
-file.xlsx
+*.xlsx
 results/
