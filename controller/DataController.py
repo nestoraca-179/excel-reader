@@ -227,7 +227,7 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
     print("🔎 VALIDACIÓN ADEL → DESCRI: buscar 'APLIC. ADEL. PROV. CxP,<nro_cobro>' en CON.descri")
     print("=" * 90)
 
-    PREFIX = "APLIC. ADEL. PROV. CxP,"
+    PREFIX = "APLIC. ADEL. PROV. CXP,"
     digit_pattern = re.compile(r"\d+")
 
     # ✅ Índice: extrae todos los números tras el prefijo en cada descri → O(m)
@@ -258,11 +258,18 @@ def validate_adel_descriptions_v2(adm_list: List[AdmDto], con_list: List[ConDto]
         total_neto_new = adm.total_neto
         saldo_new = adm.saldo
         observa = str(adm.observa or "").strip()
-        nums = digit_pattern.findall(observa)
-        if not nums:
-            continue
+        # Extraer el número de cobro justo después de 'PAGO N°' para evitar tomar el número
+        # del proveedor que aparece después en la misma cadena.
+        m = re.search(r"PAGO\s*N\D*\s*([0-9]+)", observa, re.IGNORECASE)
+        if m:
+            nro_cobro_original = m.group(1)
+        else:
+            nums = digit_pattern.findall(observa)
+            if not nums:
+                continue
+            # fallback: tomar el primer número (normalmente es el número de cobro)
+            nro_cobro_original = nums[0]
 
-        nro_cobro_original = nums[-1]
         width = len(nro_cobro_original)
         base_int = int(nro_cobro_original)
 
@@ -306,7 +313,7 @@ def validate_ivan_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
     ]
 
     for adm in ivan_adms:
-        nro_doc = (adm.nro_doc or "").strip().zfill(11)
+        nro_doc = (adm.nro_doc or "").strip().zfill(10)
         ret_tag_upper = f"Retención de IVA N°:{nro_doc}".upper()
 
         # ✅ next() con generador: detiene en la primera coincidencia sin crear lista
@@ -495,12 +502,13 @@ def validate_ncr_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
             continue
 
         nro_doc = str(adm.nro_doc or "").strip()
-        pref = f"N/CR2.{nro_doc}"
+        nro_fact = str(adm.nro_fact or "").strip()
+        pref = f"N/cp:{nro_fact}"
         pref_upper = pref.upper()
 
         for idx, con in enumerate(con_list, 1):
             descri_upper = str(con.descri or "").upper()
-            if pref_upper in descri_upper:
+            if pref_upper in descri_upper and nro_doc == str(con.docref or "").strip():
                 fila_con = idx + 1
                 adm.has_coincidence = True
                 adm.row_coincidence = fila_con
@@ -521,7 +529,7 @@ def validate_ndb_descriptions(adm_list: List[AdmDto], con_list: List[ConDto]):
         if (adm.co_tipo_doc or "").strip() != "N/DB":
             continue
 
-        nro_doc = str(adm.nro_doc or "").strip().zfill(11)
+        nro_doc = str(adm.nro_doc or "").strip().zfill(10)
         pref = f"N/DB2.{nro_doc}"
         pref_upper = pref.upper()
 

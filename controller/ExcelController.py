@@ -8,6 +8,7 @@ from openpyxl.styles import Border, Font, PatternFill, Side
 
 from models.AdmDTO import AdmDto
 from models.ConDTO import ConDto
+from utils.StringUtils import to_str_preserve
 
 def validate_file(ruta: str) -> bool:
     """Valida si el archivo Excel existe"""
@@ -21,31 +22,17 @@ def read_adm_sheet(excel_path: str) -> List[AdmDto]:
     """Lee hoja ADM y retorna lista de DTOs"""
     df_adm = None
     try:
-        # Converter to preserve leading zeros and avoid '.0' when pandas casts numeric cells
-        def _to_str_preserve(x):
-            if pd.isna(x):
-                return ''
-            try:
-                # Floats that are integers should be shown without .0
-                if isinstance(x, float):
-                    if x.is_integer():
-                        return str(int(x))
-                    return str(x)
-                return str(x)
-            except Exception:
-                return str(x)
-
         converters = {
-            'nro_doc': _to_str_preserve,
-            'co_tipo_doc': _to_str_preserve,
-            'nro_fact': _to_str_preserve,
-            'co_prov': _to_str_preserve,
-            'co_mone_doc': _to_str_preserve,
-            'Rel_Inv': _to_str_preserve,
-            'prov_des': _to_str_preserve,
-            'observa': _to_str_preserve,
-            'tipo_mov': _to_str_preserve,
-            'Mon_Rep': _to_str_preserve
+            'nro_doc': to_str_preserve,
+            'co_tipo_doc': to_str_preserve,
+            'nro_fact': to_str_preserve,
+            'co_prov': to_str_preserve,
+            'co_mone_doc': to_str_preserve,
+            'Rel_Inv': to_str_preserve,
+            'prov_des': to_str_preserve,
+            'observa': to_str_preserve,
+            'tipo_mov': to_str_preserve,
+            'Mon_Rep': to_str_preserve
         }
 
         df_adm = pd.read_excel(excel_path, sheet_name='ADM', header=0, converters=converters, engine='openpyxl')
@@ -186,7 +173,12 @@ def read_con_sheet(excel_path: str) -> List[ConDto]:
     """Lee hoja CON y retorna lista de DTOs"""
     df_con = None
     try:
-        df_con = pd.read_excel(excel_path, sheet_name='CON', header=0)
+        converters = {
+            'co_cue': to_str_preserve,
+            'docref': to_str_preserve
+        }
+
+        df_con = pd.read_excel(excel_path, sheet_name='CON', header=0, converters=converters)
         print(f"📊 Hoja CON cargada: {len(df_con)} filas")
 
         con_list: List[ConDto] = []
